@@ -1,0 +1,25 @@
+{
+  "compilerOptions": {
+    // Base options:
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "target": "ES2023",
+    "verbatimModuleSyntax": true,
+    "allowJs": true,
+    "resolveJsonModule": true,
+    "moduleDetection": "force",
+    "isolatedModules": true,
+
+    // Strictness:
+    "strict": true,
+    "noUncheckedIndexedAccess": true,
+
+    // Transpilation with TypeScript:
+    "moduleResolution": "NodeNext",
+    "module": "NodeNext",
+    "outDir": "dist",
+    "sourceMap": true,
+
+    "lib": ["es2023"]
+  }
+}
