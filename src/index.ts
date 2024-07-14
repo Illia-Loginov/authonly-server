@@ -1,4 +1,3 @@
-import 'dotenv/config';
 import app from './app.js';
 import { port, serverUrl } from './config/server.config.js';
 

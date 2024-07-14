@@ -1,8 +1,9 @@
-// TODO: add validation
+import { validateServerConfig } from './envValidation.js';
+
 const {
-  PORT: port = 3000,
-  NODE_ENV: env = 'development',
+  PORT: port,
+  NODE_ENV: env,
   SERVER_URL: serverUrl
-} = process.env;
+} = validateServerConfig();
 
 export { port, env, serverUrl };
