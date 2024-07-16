@@ -12,8 +12,7 @@ const createUserSchema = z.object({
     .max(64)
     .regex(/^[a-zA-Z0-9!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?`~]*$/, {
       message: 'Contains forbidden characters'
-    }),
-  public: z.boolean().default(false)
+    })
 });
 
 export const validateCreateUser = (payload: any) =>

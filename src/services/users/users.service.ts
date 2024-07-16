@@ -13,7 +13,7 @@ export const createUser = async (payload: any) => {
       ...data,
       password: hashedPassword
     })
-    .returning(['username', 'public', 'created_at'])
+    .returning(['id', 'username', 'created_at'])
     .executeTakeFirst();
 
   return user;
