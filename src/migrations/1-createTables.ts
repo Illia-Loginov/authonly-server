@@ -8,7 +8,7 @@ export const up = async (db: Kysely<any>): Promise<void> => {
       col.primaryKey().defaultTo(sql`uuid_generate_v4()`)
     )
     .addColumn('username', 'varchar(32)', (col) => col.notNull())
-    .addColumn('password', 'varchar(60)', (col) => col.notNull())
+    .addColumn('password', 'varchar(128)', (col) => col.notNull())
     .addColumn('public', 'boolean', (col) => col.defaultTo(false).notNull())
     .addColumn('created_at', 'timestamp', (col) =>
       col.defaultTo(sql`current_timestamp`)
