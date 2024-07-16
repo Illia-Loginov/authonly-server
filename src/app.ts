@@ -1,4 +1,5 @@
 import express, { json } from 'express';
+import healthcheckRouter from './routes/healthcheck.routes.js';
 import usersRouter from './routes/users.routes.js';
 import { errorHandler } from './middleware/errorHandler.js';
 
@@ -6,10 +7,7 @@ const app = express();
 
 app.use(json());
 
-app.get('/', (req, res) => {
-  res.status(200).send('Ok');
-});
-
+app.use('/healthcheck', healthcheckRouter);
 app.use('/users', usersRouter);
 
 app.use(errorHandler);
