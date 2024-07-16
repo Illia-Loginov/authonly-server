@@ -39,3 +39,12 @@ const dbConfigSchema = z.object({
 });
 
 export const validateDbConfig = validateEnv(dbConfigSchema, 'db');
+
+const sessionConfigSchema = z.object({
+  COOKIE_SECRET: z.string()
+});
+
+export const validateSessionConfig = validateEnv(
+  sessionConfigSchema,
+  'session'
+);
