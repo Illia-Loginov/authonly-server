@@ -1,6 +1,7 @@
 import { hash } from 'argon2';
 import { validateUserCreds } from './users.validate.js';
 import { db } from '../../db.js';
+import { createSession } from '../sessions/sessions.service.js';
 
 export const createUser = async (payload: any) => {
   const creds = validateUserCreds(payload);
@@ -16,5 +17,10 @@ export const createUser = async (payload: any) => {
     .returning(['id', 'username', 'created_at'])
     .executeTakeFirstOrThrow();
 
-  return user;
+  const session = await createSession(user.id);
+
+  return {
+    session,
+    user
+  };
 };
