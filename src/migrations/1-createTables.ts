@@ -52,9 +52,7 @@ export const up = async (db: Kysely<any>): Promise<void> => {
   await db.schema
     .createTable('sessions')
     .ifNotExists()
-    .addColumn('id', 'uuid', (col) =>
-      col.primaryKey().defaultTo(sql`uuid_generate_v4()`)
-    )
+    .addColumn('id', 'varchar(64)', (col) => col.primaryKey().notNull())
     .addColumn('user', 'uuid', (col) =>
       col.references('users.id').onDelete('cascade').notNull()
     )
