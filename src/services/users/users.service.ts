@@ -1,20 +1,20 @@
 import { hash } from 'argon2';
-import { validateCreateUser } from './users.validate.js';
+import { validateUserCreds } from './users.validate.js';
 import { db } from '../../db.js';
 
 export const createUser = async (payload: any) => {
-  const data = validateCreateUser(payload);
+  const creds = validateUserCreds(payload);
 
-  const hashedPassword = await hash(data.password);
+  const hashedPassword = await hash(creds.password);
 
   const user = await db
     .insertInto('users')
     .values({
-      ...data,
+      ...creds,
       password: hashedPassword
     })
     .returning(['id', 'username', 'created_at'])
-    .executeTakeFirst();
+    .executeTakeFirstOrThrow();
 
   return user;
 };

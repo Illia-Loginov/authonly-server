@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-const createUserSchema = z.object({
+const userCredsSchema = z.object({
   username: z
     .string()
     .min(1)
@@ -15,5 +15,5 @@ const createUserSchema = z.object({
     })
 });
 
-export const validateCreateUser = (payload: any) =>
-  createUserSchema.parse(payload);
+export const validateUserCreds = (payload: any) =>
+  userCredsSchema.parse(payload);
