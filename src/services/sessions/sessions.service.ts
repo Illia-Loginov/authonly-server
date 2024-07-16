@@ -4,6 +4,8 @@ import { UnauthenticatedError } from '../../utils/StatusError.js';
 import { validateUserCreds } from '../users/users.validate.js';
 import { randomBytes } from 'crypto';
 import { ttl } from '../../config/sessions.config.js';
+import { validateSessionCookie } from './sessions.validate.js';
+import { ZodError } from 'zod';
 
 export const createSession = async (userId: string) => {
   return await db
@@ -42,4 +44,18 @@ export const logIn = async (payload: any) => {
       created_at: user.created_at
     }
   };
+};
+
+export const deleteSession = async (payload: any) => {
+  try {
+    const sessionId = validateSessionCookie(payload);
+
+    await db.deleteFrom('sessions').where('id', '=', sessionId).execute();
+  } catch (error) {
+    if (error instanceof ZodError) {
+      return;
+    }
+
+    throw error;
+  }
 };

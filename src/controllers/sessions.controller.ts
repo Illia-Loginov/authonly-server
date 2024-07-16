@@ -1,5 +1,5 @@
 import type { RequestHandler } from 'express';
-import { logIn } from '../services/sessions/sessions.service.js';
+import { deleteSession, logIn } from '../services/sessions/sessions.service.js';
 import type { SessionsTable } from '../types/SessionsTable.js';
 import { cookieName, cookieOptions } from '../config/sessions.config.js';
 
@@ -18,7 +18,10 @@ export const createSessionCookie = (
 
 export const logInHandler: RequestHandler = async (req, res, next) => {
   try {
-    const { session, user } = await logIn(req.body);
+    const [{ session, user }] = await Promise.all([
+      logIn(req.body),
+      deleteSession(req.signedCookies[cookieName])
+    ]);
 
     res
       .status(201)
@@ -31,6 +34,8 @@ export const logInHandler: RequestHandler = async (req, res, next) => {
 
 export const logOutHandler: RequestHandler = async (req, res, next) => {
   try {
+    await deleteSession(req.signedCookies[cookieName]);
+
     res.status(204).clearCookie(cookieName, cookieOptions).end();
   } catch (error) {
     next(error);
