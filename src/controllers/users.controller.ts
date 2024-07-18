@@ -4,7 +4,10 @@ import { createSessionCookie } from './sessions.controller.js';
 
 export const createUserHandler: RequestHandler = async (req, res, next) => {
   try {
-    const { session, user } = await createUser(req.body);
+    const [{ session, user }] = await Promise.all([
+      createUser(req.body),
+      deleteSession(req.signedCookies[cookieName])
+    ]);
 
     res
       .status(201)
