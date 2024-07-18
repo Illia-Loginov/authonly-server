@@ -1,6 +1,8 @@
-import type { RequestHandler } from 'express';
-import { createUser } from '../services/users/users.service.js';
+import type { RequestHandler, Request } from 'express';
+import { createUser, deleteUser } from '../services/users/users.service.js';
 import { createSessionCookie } from './sessions.controller.js';
+import { cookieName, cookieOptions } from '../config/sessions.config.js';
+import { deleteSession } from '../services/sessions/sessions.service.js';
 
 export const createUserHandler: RequestHandler = async (req, res, next) => {
   try {
@@ -13,6 +15,23 @@ export const createUserHandler: RequestHandler = async (req, res, next) => {
       .status(201)
       .cookie(...createSessionCookie(session))
       .send({ user });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const deleteUserHandler: RequestHandler = async (
+  req: Request & { user?: any },
+  res,
+  next
+) => {
+  try {
+    const deletedUser = await deleteUser(req.params, req.user);
+
+    res
+      .status(200)
+      .clearCookie(cookieName, cookieOptions)
+      .json({ user: deletedUser });
   } catch (error) {
     next(error);
   }

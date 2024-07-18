@@ -1,6 +1,8 @@
+import { isAuthenticated } from '../../middleware/auth.middleware.js';
 import { z } from 'zod';
 
-const userCredsSchema = z.object({
+const fullUserSchema = z.object({
+  id: z.string().uuid(),
   username: z
     .string()
     .min(1)
@@ -12,8 +14,54 @@ const userCredsSchema = z.object({
     .max(64)
     .regex(/^[a-zA-Z0-9!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?`~]*$/, {
       message: 'Contains forbidden characters'
-    })
+    }),
+  created_at: z.date()
 });
 
+type FullUserSchema = z.infer<typeof fullUserSchema>;
+
 export const validateUserCreds = (payload: any) =>
-  userCredsSchema.parse(payload);
+  fullUserSchema.pick({ username: true, password: true }).parse(payload);
+
+export const validateUserId = (payload: any) =>
+  fullUserSchema.pick({ id: true }).parse(payload);
+
+function validateReqUser<TKey extends keyof FullUserSchema>(
+  payload: any,
+  props: TKey[],
+  required?: true
+): Pick<FullUserSchema, TKey>;
+function validateReqUser<TKey extends keyof FullUserSchema>(
+  payload: any,
+  props: TKey[],
+  required: false
+): null | Pick<FullUserSchema, TKey>;
+function validateReqUser<TKey extends keyof FullUserSchema>(
+  payload: any,
+  props: TKey[],
+  required: boolean = true
+): null | Pick<FullUserSchema, TKey> {
+  const pickObject = props.reduce(
+    (obj, prop) => ({
+      ...obj,
+      [prop]: true
+    }),
+    {} as Partial<Record<keyof FullUserSchema, true>>
+  );
+
+  const result = fullUserSchema.pick(pickObject).safeParse(payload);
+
+  if (result.success) {
+    return result.data;
+  }
+
+  if (required) {
+    throw new Error(
+      `${isAuthenticated.name} middleware is required on this route`
+    );
+  }
+
+  return null;
+}
+
+export { validateReqUser };
