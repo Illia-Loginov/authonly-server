@@ -1,4 +1,4 @@
-import type { Generated } from 'kysely';
+import type { Generated, Insertable, Selectable, Updateable } from 'kysely';
 
 export interface ResourcesTable {
   id: Generated<string>;
@@ -7,3 +7,7 @@ export interface ResourcesTable {
   public: boolean;
   created_at: Generated<Date>;
 }
+
+export type Resource = Selectable<ResourcesTable>;
+export type NewResource = Insertable<ResourcesTable>;
+export type ResourceUpdate = Updateable<ResourcesTable>;
