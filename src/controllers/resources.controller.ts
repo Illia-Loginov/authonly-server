@@ -1,7 +1,8 @@
 import type { RequestHandler, Request } from 'express';
 import {
   createResource,
-  deleteResource
+  deleteResource,
+  editResource
 } from '../services/resources/resources.service.js';
 
 export const createResourceHandler: RequestHandler = async (
@@ -27,6 +28,20 @@ export const deleteResourceHandler: RequestHandler = async (
     const deletedResource = await deleteResource(req.params, req.user);
 
     res.status(200).json({ resource: deletedResource });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const editResourceHandler: RequestHandler = async (
+  req: Request & { user?: any },
+  res,
+  next
+) => {
+  try {
+    const resource = await editResource(req.body, req.params, req.user);
+
+    res.status(200).json({ resource });
   } catch (error) {
     next(error);
   }

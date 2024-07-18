@@ -37,3 +37,25 @@ export const deleteResource = async (payload: any, reqUser: any) => {
 
   return deletedResource;
 };
+
+export const editResource = async (
+  reqBody: any,
+  reqParams: any,
+  reqUser: any
+) => {
+  const patch = validateResourceValue(reqBody);
+  const { id } = validateResourceId(reqParams);
+  const authenticatedUser = validateReqUser(reqUser, ['id'], true);
+
+  const resource = await db
+    .updateTable('resources')
+    .set(patch)
+    .where('id', '=', id)
+    .where('owner', '=', authenticatedUser.id)
+    .returning(['id', 'value', 'owner', 'created_at'])
+    .executeTakeFirstOrThrow(() => {
+      throw new ForbiddenError('Can only edit owned resources');
+    });
+
+  return resource;
+};

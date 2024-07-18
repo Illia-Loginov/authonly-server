@@ -1,7 +1,8 @@
 import { Router } from 'express';
 import {
   createResourceHandler,
-  deleteResourceHandler
+  deleteResourceHandler,
+  editResourceHandler
 } from '../controllers/resources.controller.js';
 import { isAuthenticated } from '../middleware/auth.middleware.js';
 
@@ -19,6 +20,10 @@ router
   .delete(
     isAuthenticated({ required: true, userProperties: ['id'] }),
     deleteResourceHandler
+  )
+  .patch(
+    isAuthenticated({ required: true, userProperties: ['id'] }),
+    editResourceHandler
   );
 
 export { router as resourcesRouter };
