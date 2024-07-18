@@ -1,5 +1,8 @@
 import { Router } from 'express';
-import { createResourceHandler } from '../controllers/resources.controller.js';
+import {
+  createResourceHandler,
+  deleteResourceHandler
+} from '../controllers/resources.controller.js';
 import { isAuthenticated } from '../middleware/auth.middleware.js';
 
 const router = Router();
@@ -9,6 +12,13 @@ router
   .post(
     isAuthenticated({ required: true, userProperties: ['id'] }),
     createResourceHandler
+  );
+
+router
+  .route('/:id')
+  .delete(
+    isAuthenticated({ required: true, userProperties: ['id'] }),
+    deleteResourceHandler
   );
 
 export { router as resourcesRouter };

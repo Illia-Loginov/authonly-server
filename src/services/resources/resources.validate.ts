@@ -9,3 +9,6 @@ const fullResourceSchema = z.object({
 
 export const validateResourceValue = (payload: any) =>
   fullResourceSchema.pick({ value: true }).parse(payload);
+
+export const validateResourceId = (payload: any) =>
+  fullResourceSchema.pick({ id: true }).parse(payload);
