@@ -5,6 +5,7 @@ import cookieParser from 'cookie-parser';
 import { cookieSecret } from './config/sessions.config.js';
 import { usersRouter } from './routes/users.routes.js';
 import { sessionsRouter } from './routes/sessions.routes.js';
+import { resourcesRouter } from './routes/resources.routes.js';
 
 const app = express();
 
@@ -14,6 +15,7 @@ app.use(cookieParser(cookieSecret));
 app.use('/healthcheck', healthcheckRouter);
 app.use('/users', usersRouter);
 app.use('/sessions', sessionsRouter);
+app.use('/resources', resourcesRouter);
 
 app.use(errorHandler);
 
