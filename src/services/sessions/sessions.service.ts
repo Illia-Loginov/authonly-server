@@ -6,6 +6,9 @@ import { randomBytes } from 'crypto';
 import { ttl } from '../../config/sessions.config.js';
 import { validateSessionCookie } from './sessions.validate.js';
 import { ZodError } from 'zod';
+import type { Database } from '../../types/Database.js';
+import type { AnyColumn } from 'kysely';
+import type { SelectExpression } from 'kysely';
 
 export const createSession = async (userId: string) => {
   return await db
@@ -58,4 +61,28 @@ export const deleteSession = async (payload: any) => {
 
     throw error;
   }
+};
+
+export const getUserBySessionId = async (
+  payload: any,
+  userProperties: AnyColumn<Database, 'users'>[]
+) => {
+  const sessionId = validateSessionCookie(payload);
+
+  const user = await db
+    .selectFrom('sessions')
+    .innerJoin('users', 'users.id', 'sessions.user')
+    .select(
+      userProperties.map(
+        (prop): SelectExpression<Database, 'users'> =>
+          `users.${prop} as ${prop}`
+      )
+    )
+    .where('sessions.id', '=', sessionId)
+    .where('sessions.expires_at', '>', new Date())
+    .executeTakeFirstOrThrow(() => {
+      throw new UnauthenticatedError('No valid session token cookie provided');
+    });
+
+  return user;
 };
