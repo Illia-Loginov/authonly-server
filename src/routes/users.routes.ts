@@ -7,11 +7,13 @@ import { isAuthenticated } from '../middleware/auth.middleware.js';
 
 const router = Router();
 
-router.post('/', createUserHandler);
-router.delete(
-  '/:id',
-  isAuthenticated({ required: true, userProperties: ['id'] }),
-  deleteUserHandler
-);
+router.route('/').post(createUserHandler);
 
-export default router;
+router
+  .route('/:id')
+  .delete(
+    isAuthenticated({ required: true, userProperties: ['id'] }),
+    deleteUserHandler
+  );
+
+export { router as usersRouter };

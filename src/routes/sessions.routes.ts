@@ -6,7 +6,8 @@ import {
 
 const router = Router();
 
-router.post('/', logInHandler);
-router.delete('/', logOutHandler);
+router;
 
-export default router;
+router.route('/').post(logInHandler).delete(logOutHandler);
+
+export { router as sessionsRouter };
