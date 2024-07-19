@@ -1,22 +1,24 @@
 import { isAuthenticated } from '../../middleware/auth.middleware.js';
 import { z } from 'zod';
 
-const fullUserSchema = z.object({
-  id: z.string().uuid(),
-  username: z
-    .string()
-    .min(1)
-    .max(32)
-    .regex(/^[a-zA-Z0-9._]*$/, { message: 'Contains forbidden characters' }),
-  password: z
-    .string()
-    .min(1)
-    .max(64)
-    .regex(/^[a-zA-Z0-9!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?`~]*$/, {
-      message: 'Contains forbidden characters'
-    }),
-  created_at: z.date()
-});
+const fullUserSchema = z
+  .object({
+    id: z.string().uuid(),
+    username: z
+      .string()
+      .min(1)
+      .max(32)
+      .regex(/^[a-zA-Z0-9._]*$/, { message: 'Contains forbidden characters' }),
+    password: z
+      .string()
+      .min(1)
+      .max(64)
+      .regex(/^[a-zA-Z0-9!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?`~]*$/, {
+        message: 'Contains forbidden characters'
+      }),
+    created_at: z.date()
+  })
+  .strict();
 
 type FullUserSchema = z.infer<typeof fullUserSchema>;
 
