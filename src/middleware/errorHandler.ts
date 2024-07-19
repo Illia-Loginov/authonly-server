@@ -3,6 +3,7 @@ import { ZodError } from 'zod';
 import { StatusError } from '../utils/StatusError.js';
 import pg from 'pg';
 import { handleDbError } from '../utils/handleDbError.js';
+import { formatZodError } from '../utils/formatZodError.js';
 
 export const errorHandler: ErrorRequestHandler = (error, req, res, next) => {
   if (error instanceof pg.DatabaseError) {
@@ -10,7 +11,10 @@ export const errorHandler: ErrorRequestHandler = (error, req, res, next) => {
   }
 
   if (error instanceof ZodError) {
-    return res.status(400).json(error.format());
+    return res.status(400).json({
+      message: 'Invalid input',
+      issues: formatZodError(error)
+    });
   }
 
   if (error instanceof StatusError) {
