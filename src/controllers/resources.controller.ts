@@ -2,7 +2,8 @@ import type { RequestHandler, Request } from 'express';
 import {
   createResource,
   deleteResource,
-  editResource
+  editResource,
+  getResources
 } from '../services/resources/resources.service.js';
 
 export const createResourceHandler: RequestHandler = async (
@@ -14,6 +15,16 @@ export const createResourceHandler: RequestHandler = async (
     const resource = await createResource(req.body, req.user);
 
     res.status(201).json({ resource });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const getResourcesHandler: RequestHandler = async (req, res, next) => {
+  try {
+    const resources = await getResources(req.query);
+
+    res.status(200).json({ resources });
   } catch (error) {
     next(error);
   }
