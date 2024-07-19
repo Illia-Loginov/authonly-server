@@ -14,10 +14,14 @@ export const errorHandler: ErrorRequestHandler = (error, req, res, next) => {
   }
 
   if (error instanceof StatusError) {
-    return res.status(error.status).send(error.message);
+    return res.status(error.status).json({
+      message: error.message
+    });
   }
 
   console.error(error);
 
-  return res.status(500).end();
+  return res.status(500).json({
+    message: 'Internal server error'
+  });
 };
