@@ -36,3 +36,15 @@ export const deleteUserHandler: RequestHandler = async (
     next(error);
   }
 };
+
+export const whoamiHandler: RequestHandler = async (
+  req: Request & { user?: any },
+  res,
+  next
+) => {
+  try {
+    res.status(200).json({ user: req.user });
+  } catch (error) {
+    next(error);
+  }
+};

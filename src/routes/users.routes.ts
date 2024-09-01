@@ -1,13 +1,20 @@
 import { Router } from 'express';
 import {
   createUserHandler,
-  deleteUserHandler
+  deleteUserHandler,
+  whoamiHandler
 } from '../controllers/users.controller.js';
 import { isAuthenticated } from '../middleware/auth.middleware.js';
 
 const router = Router();
 
-router.route('/').post(createUserHandler);
+router
+  .route('/')
+  .post(createUserHandler)
+  .get(
+    isAuthenticated({ required: true, userProperties: ['id', 'username'] }),
+    whoamiHandler
+  );
 
 router
   .route('/:id')
