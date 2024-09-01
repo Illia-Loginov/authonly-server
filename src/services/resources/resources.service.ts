@@ -9,7 +9,6 @@ import {
 } from './resources.validate.js';
 import type { Database } from '../../types/Database.js';
 import type { Selection } from 'kysely';
-import type { AnyColumn } from 'kysely';
 
 export const createResource = async (payload: any, reqUser: any) => {
   const { value } = validateResourceValue(payload);
@@ -30,18 +29,29 @@ export const createResource = async (payload: any, reqUser: any) => {
 export const getResources = async (payload: any) => {
   const { offset, limit, sort } = validateListResources(payload);
 
-  const selectedColumns = ['id', 'value', 'owner', 'created_at'] as const;
+  const selectedColumns = [
+    'resources.id as id',
+    'resources.value as value',
+    'resources.created_at as created_at',
+    'users.id as owner_id',
+    'users.username as owner_username'
+  ] as const;
 
   const sortArray = Object.entries(sort).map(
     ([column, order]): OrderByExpression<
       Database,
-      'resources',
-      Selection<Database, 'resources', (typeof selectedColumns)[number]>
-    > => `${column as AnyColumn<Database, 'resources'>} ${order}`
+      'resources' | 'users',
+      Selection<
+        Database,
+        'resources' | 'users',
+        (typeof selectedColumns)[number]
+      >
+    > => `${column as keyof typeof sort} ${order}`
   );
 
   const resources = await db
     .selectFrom('resources')
+    .innerJoin('users', 'users.id', 'resources.owner')
     .select(selectedColumns)
     .offset(offset)
     .limit(limit)
