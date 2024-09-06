@@ -1,5 +1,6 @@
 import 'dotenv/config';
 import { z, ZodError, ZodSchema } from 'zod';
+import { formatZodError } from '../utils/formatZodError.js';
 
 const validateEnv = <TSchema extends ZodSchema>(
   schema: TSchema,
@@ -12,7 +13,7 @@ const validateEnv = <TSchema extends ZodSchema>(
       if (error instanceof ZodError) {
         console.log(
           `Validation error in ${configName} config:`,
-          error.format()
+          formatZodError(error)
         );
         process.exit(1);
       } else {
