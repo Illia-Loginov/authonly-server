@@ -6,9 +6,12 @@ import { cookieSecret } from './config/sessions.config.js';
 import { usersRouter } from './routes/users.routes.js';
 import { sessionsRouter } from './routes/sessions.routes.js';
 import { resourcesRouter } from './routes/resources.routes.js';
+import cors from 'cors';
+import { corsOptions } from './config/server.config.js';
 
 const app = express();
 
+app.use(cors(corsOptions));
 app.use(json());
 app.use(cookieParser(cookieSecret));
 
