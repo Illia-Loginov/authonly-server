@@ -11,5 +11,6 @@ const {
 export { port, env, serverUrl };
 
 export const corsOptions: CorsOptions = {
-  origin: [clientUrl]
+  origin: [clientUrl],
+  credentials: true
 };
