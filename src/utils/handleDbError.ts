@@ -8,8 +8,15 @@ const ERROR_CODES = {
 export const handleDbError = (error: pg.DatabaseError) => {
   switch (error.code) {
     case ERROR_CODES.UNIQUE_VIOLATION:
-      const detailRegex = /^Key \((.+)\)=\((.+)\)/;
-      return new BadRequestError(error.detail?.replace(detailRegex, `$1 "$2"`));
+      const keyValueRegex = /^Key \((.+)\)=\((.+)\)/;
+      const endingPeriodRegex = /.$/;
+
+      const message =
+        error.detail
+          ?.replace(keyValueRegex, `$1 "$2"`)
+          .replace(endingPeriodRegex, '') || 'Must be unique';
+
+      return new BadRequestError(message);
     default:
       return error;
   }
