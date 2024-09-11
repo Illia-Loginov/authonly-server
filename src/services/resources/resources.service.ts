@@ -20,7 +20,7 @@ export const createResource = async (payload: any, reqUser: any) => {
       value,
       owner: authenticatedUser.id
     })
-    .returning(['id', 'value', 'owner', 'created_at'])
+    .returning(['id', 'value', 'created_at'])
     .executeTakeFirstOrThrow();
 
   return resource;
@@ -69,7 +69,7 @@ export const deleteResource = async (payload: any, reqUser: any) => {
     .deleteFrom('resources')
     .where('id', '=', id)
     .where('owner', '=', authenticatedUser.id)
-    .returning(['id', 'value', 'owner', 'created_at'])
+    .returning(['id', 'value', 'created_at'])
     .executeTakeFirstOrThrow(() => {
       throw new ForbiddenError('Can only delete owned resources');
     });
@@ -91,7 +91,7 @@ export const editResource = async (
     .set(patch)
     .where('id', '=', id)
     .where('owner', '=', authenticatedUser.id)
-    .returning(['id', 'value', 'owner', 'created_at'])
+    .returning(['id', 'value', 'created_at'])
     .executeTakeFirstOrThrow(() => {
       throw new ForbiddenError('Can only edit owned resources');
     });
