@@ -22,9 +22,9 @@ export const createResourceHandler: RequestHandler = async (
 
 export const getResourcesHandler: RequestHandler = async (req, res, next) => {
   try {
-    const resources = await getResources(req.query);
+    const { resources, isLast } = await getResources(req.query);
 
-    res.status(200).json({ resources });
+    res.status(200).json({ resources, isLast });
   } catch (error) {
     next(error);
   }
