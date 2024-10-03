@@ -26,7 +26,6 @@ const validateEnv = <TSchema extends ZodSchema>(
 const serverConfigSchema = z.object({
   PORT: z.coerce.number().int().min(1).max(65535),
   NODE_ENV: z.enum(['development', 'production']),
-  SERVER_URL: z.string().url(),
   CLIENT_URL: z.string().url()
 });
 
