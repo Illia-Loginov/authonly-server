@@ -1,6 +1,9 @@
 {
   "name": "authonly-server",
   "version": "0.0.1",
+  "engines": {
+    "node": ">=20.0.0"
+  },
   "description": "Server of the Auth Only app",
   "main": "index.js",
   "type": "module",
