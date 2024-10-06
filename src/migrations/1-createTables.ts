@@ -1,6 +1,8 @@
 import { Kysely, sql } from 'kysely';
 
 export const up = async (db: Kysely<any>): Promise<void> => {
+  await sql`CREATE EXTENSION IF NOT EXISTS "uuid-ossp"`.execute(db);
+
   await db.schema
     .createTable('users')
     .ifNotExists()
@@ -44,4 +46,5 @@ export const down = async (db: Kysely<any>): Promise<void> => {
   await db.schema.dropTable('sessions').ifExists().execute();
   await db.schema.dropTable('resources').ifExists().execute();
   await db.schema.dropTable('users').ifExists().execute();
+  await sql`DROP EXTENSION IF EXISTS "uuid-ossp"`.execute(db);
 };
