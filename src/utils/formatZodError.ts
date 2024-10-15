@@ -1,6 +1,6 @@
 import type { ZodError } from 'zod';
 
-const getIssueKey = (path: (string | number)[]) => {
+export const getIssueKey = (path: (string | number)[]) => {
   if (path.length === 0) {
     return '';
   }
