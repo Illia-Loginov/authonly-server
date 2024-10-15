@@ -14,7 +14,8 @@
     "migrate": "node dist/scripts/migrate.js",
     "migrate:dev": "tsx src/scripts/migrate.ts",
     "rollback": "node dist/scripts/rollback.js",
-    "rollback:dev": "tsx src/scripts/rollback.ts"
+    "rollback:dev": "tsx src/scripts/rollback.ts",
+    "test": "node --test"
   },
   "author": "Illia Loginov",
   "license": "ISC",
