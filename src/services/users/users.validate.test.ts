@@ -1,6 +1,6 @@
 import { describe, it } from 'node:test';
 import { strict as assert } from 'node:assert';
-import { validateUserCreds } from './users.validate.js';
+import { validateUserCreds, validateUserId } from './users.validate.js';
 import { assertZodError } from '../../utils/assertZodError.js';
 import { userSchemaParams } from '../../config/users.config.js';
 
@@ -140,6 +140,61 @@ describe('validateUserCreds', () => {
         }
       ]),
       'username and password with forbidden characters'
+    );
+  });
+});
+
+describe('validateUserId', () => {
+  it('Returns valid input', () => {
+    const validUuid = '2dbf6a88-7fb1-4f89-9372-3a3823a6952f';
+
+    assert.deepEqual(
+      validateUserId({ id: validUuid }),
+      { id: validUuid },
+      'valid UUID'
+    );
+  });
+
+  it('Throws on invalid input', () => {
+    assert.throws(
+      () => validateUserId(null),
+      assertZodError([
+        {
+          code: 'invalid_type',
+          expected: 'object',
+          received: 'null',
+          path: [],
+          message: 'Expected object, received null'
+        }
+      ]),
+      'null'
+    );
+
+    assert.throws(
+      () => validateUserId({}),
+      assertZodError([
+        {
+          code: 'invalid_type',
+          expected: 'string',
+          received: 'undefined',
+          path: ['id'],
+          message: 'Required'
+        }
+      ]),
+      'empty object'
+    );
+
+    assert.throws(
+      () => validateUserId({ id: 'Invalid UUID' }),
+      assertZodError([
+        {
+          code: 'invalid_string',
+          validation: 'uuid',
+          path: ['id'],
+          message: 'Invalid uuid'
+        }
+      ]),
+      'invalid UUID'
     );
   });
 });
