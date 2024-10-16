@@ -1,3 +1,4 @@
+import { userSchemaParams } from '../../config/users.config.js';
 import { isAuthenticated } from '../../middleware/auth.middleware.js';
 import { z } from 'zod';
 
@@ -6,14 +7,16 @@ const fullUserSchema = z
     id: z.string().uuid(),
     username: z
       .string()
-      .min(1)
-      .max(32)
-      .regex(/^[a-zA-Z0-9._]*$/, { message: 'Contains forbidden characters' }),
+      .min(userSchemaParams.username.min)
+      .max(userSchemaParams.username.max)
+      .regex(userSchemaParams.username.regex, {
+        message: 'Contains forbidden characters'
+      }),
     password: z
       .string()
-      .min(1)
-      .max(64)
-      .regex(/^[a-zA-Z0-9!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?`~]*$/, {
+      .min(userSchemaParams.password.min)
+      .max(userSchemaParams.password.max)
+      .regex(userSchemaParams.password.regex, {
         message: 'Contains forbidden characters'
       }),
     created_at: z.date()
