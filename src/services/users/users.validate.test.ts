@@ -1,8 +1,15 @@
 import { describe, it } from 'node:test';
 import { strict as assert } from 'node:assert';
-import { validateUserCreds, validateUserId } from './users.validate.js';
+import {
+  validateReqUser,
+  validateUserCreds,
+  validateUserId
+} from './users.validate.js';
 import { assertZodError } from '../../utils/assertZodError.js';
 import { userSchemaParams } from '../../config/users.config.js';
+import type { User } from '../../types/UsersTable.js';
+
+const validUuid = '2dbf6a88-7fb1-4f89-9372-3a3823a6952f';
 
 describe('validateUserCreds', () => {
   it('Returns valid input', () => {
@@ -146,8 +153,6 @@ describe('validateUserCreds', () => {
 
 describe('validateUserId', () => {
   it('Returns valid input', () => {
-    const validUuid = '2dbf6a88-7fb1-4f89-9372-3a3823a6952f';
-
     assert.deepEqual(
       validateUserId({ id: validUuid }),
       { id: validUuid },
@@ -195,6 +200,80 @@ describe('validateUserId', () => {
         }
       ]),
       'invalid UUID'
+    );
+  });
+});
+
+describe('validateReqUser', () => {
+  it('Returns valid input', () => {
+    assert.deepEqual(
+      validateReqUser({ id: validUuid }, ['id']),
+      { id: validUuid },
+      'valid user id'
+    );
+
+    assert.deepEqual(
+      validateReqUser({ id: validUuid }, ['id'], false),
+      { id: validUuid },
+      'valid user id (not required)'
+    );
+
+    const fullValidUser: User = {
+      id: validUuid,
+      username: 'a',
+      password: 'b',
+      created_at: new Date()
+    };
+
+    assert.deepEqual(
+      validateReqUser(fullValidUser, [
+        'id',
+        'username',
+        'password',
+        'created_at'
+      ]),
+      fullValidUser,
+      'valid user id'
+    );
+
+    assert.deepEqual(
+      validateReqUser(
+        fullValidUser,
+        ['id', 'username', 'password', 'created_at'],
+        false
+      ),
+      fullValidUser,
+      'valid user id (not required)'
+    );
+  });
+
+  it('Returns null on invalid input, if not required', () => {
+    assert.equal(validateReqUser(null, ['id'], false), null, 'null');
+    assert.equal(validateReqUser({}, ['id'], false), null, 'empty object');
+    assert.equal(
+      validateReqUser({ id: 'Invalid UUID' }, ['id'], false),
+      null,
+      'invalid user'
+    );
+  });
+
+  it('Throws on invalid input, if required', () => {
+    assert.throws(
+      () => validateReqUser(null, ['id']),
+      /middleware is required on this route/,
+      'null'
+    );
+
+    assert.throws(
+      () => validateReqUser({}, ['id']),
+      /middleware is required on this route/,
+      'empty object'
+    );
+
+    assert.throws(
+      () => validateReqUser({ id: 'Invalid UUID' }, ['id']),
+      /middleware is required on this route/,
+      'invalid user'
     );
   });
 });
