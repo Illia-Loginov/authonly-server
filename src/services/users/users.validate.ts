@@ -2,7 +2,7 @@ import { userSchemaParams } from '../../config/users.config.js';
 import { isAuthenticated } from '../../middleware/auth.middleware.js';
 import { z } from 'zod';
 
-const fullUserSchema = z
+export const fullUserSchema = z
   .object({
     id: z.string().uuid(),
     username: z
@@ -19,11 +19,11 @@ const fullUserSchema = z
       .regex(userSchemaParams.password.regex, {
         message: 'Contains forbidden characters'
       }),
-    created_at: z.date()
+    created_at: z.string().datetime()
   })
   .strict();
 
-type FullUserSchema = z.infer<typeof fullUserSchema>;
+export type FullUserSchema = z.infer<typeof fullUserSchema>;
 
 export const validateUserCreds = (payload: any) =>
   fullUserSchema.pick({ username: true, password: true }).parse(payload);
