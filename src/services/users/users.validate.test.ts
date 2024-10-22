@@ -3,11 +3,11 @@ import { strict as assert } from 'node:assert';
 import {
   validateReqUser,
   validateUserCreds,
-  validateUserId
+  validateUserId,
+  type FullUserSchema
 } from './users.validate.js';
 import { assertZodError } from '../../utils/assertZodError.js';
 import { userSchemaParams } from '../../config/users.config.js';
-import type { User } from '../../types/UsersTable.js';
 
 const validUuid = '2dbf6a88-7fb1-4f89-9372-3a3823a6952f';
 
@@ -218,11 +218,11 @@ describe('validateReqUser', () => {
       'valid user id (not required)'
     );
 
-    const fullValidUser: User = {
+    const fullValidUser: FullUserSchema = {
       id: validUuid,
       username: 'a',
       password: 'b',
-      created_at: new Date()
+      created_at: new Date().toISOString()
     };
 
     assert.deepEqual(
