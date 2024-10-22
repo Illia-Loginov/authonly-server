@@ -18,7 +18,7 @@ describe('POST /users', () => {
       .send(uniqueValidUserCreds)
       .set('Accept', 'application/json');
 
-    assert.equal(response.status, 201, 'status code');
+    assert.equal(response.status, 201, 'Invalid status code');
 
     const { user: responseUser } = response.body;
 
@@ -27,13 +27,13 @@ describe('POST /users', () => {
       fullUserSchema
         .pick({ id: true, username: true, created_at: true })
         .parse(responseUser),
-      'valid response body'
+      'Invalid response body'
     );
 
     assert.equal(
       responseUser.username,
       uniqueValidUserCreds.username,
-      'expected username'
+      'Invalid username'
     );
 
     assert.ok(
@@ -41,7 +41,7 @@ describe('POST /users', () => {
         new Date(responseUser.created_at).getTime() - expectedCreatedAt
       ) <
         60 * 60 * 1000,
-      'created_at is within 1 hour of expected value'
+      'Invalid created_at'
     );
 
     const createdUsers = await db
@@ -52,12 +52,12 @@ describe('POST /users', () => {
       .limit(2)
       .execute();
 
-    assert.equal(createdUsers.length, 1, 'exactly 1 user created');
+    assert.equal(createdUsers.length, 1, 'More/less than 1 user created');
 
     assert.notEqual(
       createdUsers[0],
       uniqueValidUserCreds.password,
-      'password is not stored as is'
+      'Password is stored as is'
     );
   });
 
