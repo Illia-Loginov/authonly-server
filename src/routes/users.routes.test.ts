@@ -4,12 +4,15 @@ import request from 'supertest';
 import app from '../app.js';
 import { fullUserSchema } from '../services/users/users.validate.js';
 import { db } from '../db.js';
+import { cookieName, ttl } from '../config/sessions.config.js';
 
 describe('POST /users', () => {
   const uniqueValidUserCreds = {
     username: Date.now().toString(),
     password: Date.now().toString()
   };
+
+  let sessionId: string | undefined;
 
   it('Successfully creates and returns a new user on valid input', async () => {
     const expectedCreatedAt = Date.now();
@@ -44,6 +47,37 @@ describe('POST /users', () => {
       'Invalid created_at'
     );
 
+    const cookie = response
+      .get('Set-Cookie')
+      ?.find((cookie) => cookie.startsWith(cookieName));
+
+    assert.ok(cookie, 'No valid session token cookie provided');
+    assert.ok(cookie.includes('HttpOnly'), 'Cookie is not HttpOnly');
+    assert.ok(cookie.includes('Secure'), 'Cookie is not secure');
+    assert.ok(
+      cookie.includes('SameSite=Strict'),
+      'Cookie is not SameSite=Strict'
+    );
+    assert.ok(cookie.includes('Path=/'), 'Cookie is not in /');
+
+    const expires = cookie.match(/Expires=([^;]+);/)?.[1];
+    assert.ok(expires, 'No expires string in cookie');
+
+    assert.ok(
+      Math.abs(new Date(expires).getTime() - expectedCreatedAt - ttl) <
+        10 * 60 * 1000,
+      'Invalid expires date'
+    );
+
+    const createdSessions = await db
+      .selectFrom('sessions')
+      .select('id')
+      .where('user', '=', responseUser.id)
+      .limit(2)
+      .execute();
+    assert.equal(createdSessions.length, 1, 'More/less than 1 session created');
+    sessionId = createdSessions[0]?.id;
+
     const createdUsers = await db
       .selectFrom('users')
       .select('password')
@@ -66,6 +100,9 @@ describe('POST /users', () => {
       .deleteFrom('users')
       .where('username', '=', uniqueValidUserCreds.username)
       .execute();
+
+    if (sessionId)
+      await db.deleteFrom('sessions').where('id', '=', sessionId).execute();
 
     await db.destroy();
   });
