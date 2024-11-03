@@ -51,13 +51,13 @@ export const getResources = async (payload: any) => {
       .execute(),
     await db
       .selectFrom('resources')
-      .select(({ fn }) => fn.countAll<number>().as('count'))
+      .select(({ fn }) => fn.countAll().as('count'))
       .execute()
   ]);
 
   return {
     resources,
-    isLast: offset + limit >= (rowCount?.[0]?.count || 0)
+    isLast: offset + limit >= (Number(rowCount?.[0]?.count) || 0)
   };
 };
 
