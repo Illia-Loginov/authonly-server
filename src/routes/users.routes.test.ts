@@ -19,8 +19,7 @@ describe('POST /users', () => {
     const expectedCreatedAt = Date.now();
     const response = await request(app)
       .post('/users')
-      .send(uniqueValidUserCreds)
-      .set('Accept', 'application/json');
+      .send(uniqueValidUserCreds);
 
     assert.equal(response.status, 201, 'Invalid status code');
 
@@ -52,7 +51,7 @@ describe('POST /users', () => {
       .get('Set-Cookie')
       ?.find((cookie) => cookie.startsWith(cookieName));
 
-    assert.ok(cookie, 'No valid session token cookie provided');
+    assert.ok(cookie, 'No valid session token cookie returned');
     assert.ok(cookie.includes('HttpOnly'), 'Cookie is not HttpOnly');
     assert.ok(cookie.includes('Secure'), 'Cookie is not secure');
     assert.ok(
@@ -142,7 +141,96 @@ describe('POST /users', () => {
 
     if (sessionId)
       await db.deleteFrom('sessions').where('id', '=', sessionId).execute();
-
-    await db.destroy();
   });
+});
+
+describe('GET /users', () => {
+  const uniqueValidUserCreds = {
+    username: Date.now().toString(),
+    password: Date.now().toString()
+  };
+
+  let cookie: string | undefined;
+
+  it('Rejects, when not authenticated', async () => {
+    const response = await request(app).get('/users');
+
+    assert.equal(response.status, 401, 'Invalid status code');
+    assert.equal(
+      response.body.message,
+      'No valid session token cookie provided'
+    );
+  });
+
+  it('Rejects, when using incorrect session token', async () => {
+    const response = await request(app)
+      .get('/users')
+      .set('Cookie', [`${cookieName}=incorrect_session_token`]);
+
+    assert.equal(response.status, 401, 'Invalid status code');
+    assert.equal(
+      response.body.message,
+      'No valid session token cookie provided'
+    );
+  });
+
+  it('Returns current user, when logged in', async () => {
+    const signUpResponse = await request(app)
+      .post('/users')
+      .send(uniqueValidUserCreds);
+
+    cookie = signUpResponse
+      .get('Set-Cookie')
+      ?.find((cookie) => cookie.startsWith(cookieName));
+
+    assert.ok(cookie, 'No valid session token cookie returned');
+
+    const whoamiResponse = await request(app)
+      .get('/users')
+      .set('Cookie', [cookie]);
+
+    assert.equal(whoamiResponse.status, 200, 'Invalid status code');
+
+    const { user: responseUser } = whoamiResponse.body;
+
+    assert.deepEqual(
+      responseUser,
+      fullUserSchema.pick({ id: true, username: true }).parse(responseUser),
+      'Invalid response body'
+    );
+
+    assert.equal(
+      responseUser.username,
+      uniqueValidUserCreds.username,
+      'Invalid username'
+    );
+
+    await db
+      .deleteFrom('sessions')
+      .where('user', '=', responseUser.id)
+      .execute();
+  });
+
+  it('Rejects, when using expired session token', async () => {
+    assert.ok(cookie, 'No session token cookie');
+
+    const response = await request(app).get('/users').set('Cookie', [cookie]);
+
+    assert.equal(response.status, 401, 'Invalid status code');
+    assert.equal(
+      response.body.message,
+      'No valid session token cookie provided'
+    );
+  });
+
+  after(async () => {
+    await db
+      .deleteFrom('users')
+      .where('username', '=', uniqueValidUserCreds.username)
+      .execute();
+  });
+});
+
+after(async () => {
+  await db.destroy();
 });
