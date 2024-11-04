@@ -13,8 +13,6 @@ describe('POST /users', () => {
     password: Date.now().toString()
   };
 
-  let sessionId: string | undefined;
-
   it('Successfully creates and returns a new user on valid input', async () => {
     const expectedCreatedAt = Date.now();
     const response = await request(app)
@@ -76,7 +74,6 @@ describe('POST /users', () => {
       .limit(2)
       .execute();
     assert.equal(createdSessions.length, 1, 'More/less than 1 session created');
-    sessionId = createdSessions[0]?.id;
 
     const createdUsers = await db
       .selectFrom('users')
@@ -138,9 +135,6 @@ describe('POST /users', () => {
       .deleteFrom('users')
       .where('username', '=', uniqueValidUserCreds.username)
       .execute();
-
-    if (sessionId)
-      await db.deleteFrom('sessions').where('id', '=', sessionId).execute();
   });
 });
 
@@ -357,7 +351,6 @@ describe('DELETE /users/:id', async () => {
     const ids = users.map(({ id }) => id);
 
     await db.deleteFrom('users').where('id', 'in', ids).execute();
-    await db.deleteFrom('sessions').where('user', 'in', ids).execute();
   });
 });
 
